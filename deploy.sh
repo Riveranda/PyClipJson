@@ -1,0 +1,1 @@
+python3 -m twine upload --skip-existing dist/* --repository-url http://upload.pypi.org/legacy/

@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+Pydis.egg-info/PKG-INFO
+Pydis.egg-info/SOURCES.txt
+Pydis.egg-info/dependency_links.txt
+Pydis.egg-info/top_level.txt
