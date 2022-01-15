@@ -25,7 +25,12 @@ import sys
 import os
 from os.path import exists
 
-from Pydis import *
+if __name__ != "__main__":
+    from Pydis import *
+else:
+    sys.path.append('../Pydis')
+    from Pydis.Pydis import *
+    
 def run(str):
     os.system(str)
     
