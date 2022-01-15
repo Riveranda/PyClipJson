@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from sys import argv, stdin
+
 try:
     import ujson as json
 except ImportError:
@@ -30,6 +31,17 @@ from pyperclip import copy as pyperclipcopy
 
 FILENAME = ".pydisstore.json"
 MAXKEYMEMSIZE = 10
+
+class InvalidKeyException(Exception):
+    def __init__(self):
+        self.message = "The passed key is invalid."
+        super().__init__(self.message)
+
+class InvalidArgumentException(Exception):
+    def __init__(self, key):
+        self.key = key
+        self.message = str(self.key) + " Is an invalid key."
+        super().__init__()
 
 def readFromFile():
     JSON_OBJECT = {"numerals": {}, "custom": {}, "lastkey" : []}
@@ -59,11 +71,11 @@ def writeToFile(data, key):
         if len(JSON_OBJECT["lastkey"]) == 0 or JSON_OBJECT["lastkey"][-1] != finalkey:
             JSON_OBJECT["lastkey"].append(finalkey)
         print("WRITING DATA TO " + finalkey)
-        json.dump(JSON_OBJECT, file)
+        json.dump(JSON_OBJECT, file, indent=4)
         
 def writeObjToFile(JSON_OBJECT):
     with open(FILENAME, 'w') as file:
-        json.dump(JSON_OBJECT, file)
+        json.dump(JSON_OBJECT, file, indent=4)
    
         
 def save(args):
@@ -77,19 +89,25 @@ def move(args):
 
 def copy(args):
     JSON_OBJECT = readFromFile()
-    key = JSON_OBJECT["lastkey"][-1]
+    key = None
     if len(args) > 2:
         key = args[2].strip()
+    elif len(JSON_OBJECT["lastkey"]) != 0:
+        key = JSON_OBJECT["lastkey"][-1]
+    else:
+        raise InvalidKeyException
     isint = str.isdigit(key)
     
-    pyperclipcopy(JSON_OBJECT["numerals" if isint else "custom"][key])
-    
-    delete = True if len(args) == 4 and args[3].lower().strip() == '-d' else False
-    if delete:
-        del JSON_OBJECT["numerals" if isint else "custom"][key]
-        if key in JSON_OBJECT["lastkey"]:
-            JSON_OBJECT["lastkey"] = JSON_OBJECT["lastkey"][1:] if len(JSON_OBJECT["lastkey"]) > 0 else []
-        writeObjToFile(JSON_OBJECT)
+    if key in JSON_OBJECT["numerals" if isint else "custom"]:
+        pyperclipcopy(JSON_OBJECT["numerals" if isint else "custom"][key])
+        delete = True if len(args) == 4 and args[3].lower().strip() == '-d' else False
+        if delete:
+            del JSON_OBJECT["numerals" if isint else "custom"][key]
+            if key in JSON_OBJECT["lastkey"]:
+                JSON_OBJECT["lastkey"] = JSON_OBJECT["lastkey"][1:] if len(JSON_OBJECT["lastkey"]) > 0 else []
+            writeObjToFile(JSON_OBJECT)
+    else:
+        raise InvalidKeyException
     
       
 
@@ -97,11 +115,18 @@ def printdb(args):
     pass
 
 def clear(args):
-    JSON_OBJECT = JSON_OBJECT = {"numerals": {}, "custom": {}, "lastkey" : []}
+    JSON_OBJECT = {"numerals": {}, "custom": {}, "lastkey" : []}
     writeObjToFile(JSON_OBJECT)
 
 def delete(args):
-    pass
+    if(len(args) == 3):
+        key = args[2].trim()
+        JSON_OBJECT = readFromFile()
+        if(str.isdigit(key)):
+            del JSON_OBJECT["numerals"][key] 
+        else:
+            del JSON_OBJECT["custom"][key]
+        writeObjToFile(JSON_OBJECT)
 
 def copykey(args):
     pass
@@ -137,22 +162,6 @@ def main():
         arg = argv[1].lower().strip()
         func = FUNCTIONS[arg]
         func(argv)
-
-def testmockmain(*args):
-    a = [None]
-    for item in args:
-        a.append(item)
-    if len(a) < 2 or (len(a) == 2 and '-' not in a[1]):
-        # command | pydis 
-        # command | pydis mykey
-        pipe(a)
-    else:
-        # Fetch function from dictionary and execute
-        arg = a[1].lower().strip()
-        func = FUNCTIONS[arg]
-        func(a)
-
     
 if __name__ == '__main__':
     main()
-    

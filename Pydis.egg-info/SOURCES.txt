@@ -2,7 +2,11 @@ LICENSE
 README.md
 pyproject.toml
 setup.cfg
+Pydis/Pydis.py
+Pydis/__init__.py
 Pydis.egg-info/PKG-INFO
 Pydis.egg-info/SOURCES.txt
 Pydis.egg-info/dependency_links.txt
 Pydis.egg-info/top_level.txt
+Pydis/tests/__init__.py
+Pydis/tests/tests.py

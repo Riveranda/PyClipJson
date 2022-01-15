@@ -22,15 +22,10 @@
 
 import unittest
 import sys
-import logging as log
 import os
 from os.path import exists
 
-  
-# importing
-sys.path.append('../Pydis')
-from Pydis.Pydis import *
-
+from Pydis import *
 def run(str):
     os.system(str)
     
@@ -43,10 +38,13 @@ def deldatabasefile():
 
 pythonstr = "python3 Pydis/Pydis.py"
 
+def systemexcecute(str):
+    os.system(str)
 class TestPipe(unittest.TestCase):
     
     def test_pipe(self):
         deldatabasefile()
+        print("NAME: " + __name__)
         os.system("echo \"test1\" | " + pythonstr)
         self.assertTrue(exists(FILENAME))
 
@@ -94,12 +92,7 @@ class TestClear(unittest.TestCase):
         os.system("echo \"test1\" | " + pythonstr)
         os.system(pythonstr + " -clear")
         json = readFromFile()
-        self.assertEqual({"numerals": {}, "custom": {}, "lastkey" : []}, json)
+        self.assertEqual({"numerals": {}, "custom": {}, "lastkey" : []}, json)     
 
-
-        
-         
-        
-    
 if __name__ == '__main__':
     unittest.main()

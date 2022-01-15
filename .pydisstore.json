@@ -1,1 +1,9 @@
-{"numerals":{},"custom":{"mykey":"test2\n"},"lastkey":["mykey"]}
+{
+    "numerals": {},
+    "custom": {
+        "mykey": "test2\n"
+    },
+    "lastkey": [
+        "mykey"
+    ]
+}
