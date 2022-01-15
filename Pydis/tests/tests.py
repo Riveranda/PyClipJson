@@ -31,9 +31,6 @@ else:
     sys.path.append('../Pydis')
     from Pydis.Pydis import *
     
-def run(str):
-    os.system(str)
-    
 def deldatabasefile():
     try:
         os.remove(".pydisstore.json")
@@ -98,6 +95,56 @@ class TestClear(unittest.TestCase):
         os.system(pythonstr + " -clear")
         json = readFromFile()
         self.assertEqual({"numerals": {}, "custom": {}, "lastkey" : []}, json)     
+        
+class TestMove(unittest.TestCase):
+    
+    def test_move(self):
+        deldatabasefile()
+        os.system("echo \"test1\" | " + pythonstr)
+        os.system("echo \"test2\" | " + pythonstr)
+        os.system(pythonstr + " -m 1 0")
+        json = readFromFile()
+        self.assertTrue("0" in json["numerals"])
+        self.assertTrue("1" in json["numerals"])
+        self.assertEqual(json["numerals"]["0"], "test2\n")
+        self.assertEqual(json["numerals"]["1"], "test1\n")
+        
+
+class TestFile(unittest.TestCase):
+    
+    def test_file_save(self):
+        contents = None
+        with open("testfile.txt") as file:
+            contents = file.read()
+        deldatabasefile()
+        os.system(pythonstr + " -f \"testfile.txt\"")
+        json = readFromFile()
+        self.assertTrue("0" in json["numerals"])
+        self.assertEqual(contents, json["numerals"]["0"])
+    
+    def test_file_custom_key(self):
+        contents = None
+        with open("testfile.txt") as file:
+            contents = file.read()
+        deldatabasefile()
+        os.system(pythonstr + " -f \"testfile.txt\" 1")
+        json = readFromFile()
+        self.assertTrue("1" in json["numerals"])
+        self.assertEqual(contents, json["numerals"]["1"])
+    
+    def test_file_readrange(self):
+        contents = None
+        string = ""
+        with open("testfile.txt") as file:
+            contents = file.readlines()[0:6]
+        for s in contents:
+            string += s
+        deldatabasefile()
+        os.system(pythonstr + " -f \"testfile.txt\" 1 0:5")
+        json = readFromFile()
+        self.assertTrue("1" in json["numerals"])
+        self.assertEquals(string, json["numerals"]["1"])
+
 
 if __name__ == '__main__':
     unittest.main()

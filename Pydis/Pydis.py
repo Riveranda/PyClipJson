@@ -30,7 +30,7 @@ except ImportError:
 from pyperclip import copy as pyperclipcopy
 
 FILENAME = ".pydisstore.json"
-MAXKEYMEMSIZE = 10
+MAXKEYMEMSIZE = 20
 
 class InvalidKeyException(Exception):
     def __init__(self):
@@ -38,10 +38,13 @@ class InvalidKeyException(Exception):
         super().__init__(self.message)
 
 class InvalidArgumentException(Exception):
-    def __init__(self, key):
-        self.key = key
-        self.message = str(self.key) + " Is an invalid key."
-        super().__init__()
+    def __init__(self):
+        self.message = "Invalid key."
+        super().__init__(self.message)
+
+def subcat(key):
+    return "numerals" if str.isdigit(key) else "custom"
+
 
 def readFromFile():
     JSON_OBJECT = {"numerals": {}, "custom": {}, "lastkey" : []}
@@ -67,7 +70,7 @@ def writeToFile(data, key):
 
     with open(FILENAME, 'w') as file:
         finalkey = getKey()
-        JSON_OBJECT["numerals" if str.isdigit(finalkey) else "custom"][finalkey] = data
+        JSON_OBJECT[subcat(finalkey)][finalkey] = data
         if len(JSON_OBJECT["lastkey"]) == 0 or JSON_OBJECT["lastkey"][-1] != finalkey:
             JSON_OBJECT["lastkey"].append(finalkey)
         print("WRITING DATA TO " + finalkey)
@@ -82,10 +85,54 @@ def save(args):
     pass
 
 def file(args):
-    pass
-
+    if len(args) > 2:
+        contents, key = None, None
+        filepath = args[2].strip()        
+        with open(filepath, "r") as file:
+            
+            def readrange(arg):
+                split = arg.split(":")
+                range = [int(i) for i in split]
+                string = ""
+                if(len(range)) > 2 or len(range) == 0:
+                    raise InvalidArgumentException
+                if len(range) == 1:
+                    range.append(range[1])
+                for s in file.readlines()[range[0]:range[1] + 1]:
+                    string += s
+                return string
+        
+            if len(args) == 3:
+                contents = file.read()
+            elif len(args) == 4:
+                if(':' in args[3]):
+                    contents = readrange(args[3])
+                else:
+                    key = args[3].strip()
+                    contents = file.read()
+            elif len(args) == 5:
+                key = args[3].strip()
+                if(':' in args[4]):
+                    contents = readrange(args[4])
+                
+            writeToFile(contents, key)
+    else:
+        raise InvalidArgumentException
+        
 def move(args):
-    pass
+    if(len(args) == 4):
+        key1, key2 = args[2].strip(), args[3].strip()
+        subcat1, subcat2 = subcat(key1), subcat(key2)
+        JSON_OBJECT = readFromFile()
+        if key1 in JSON_OBJECT[subcat1] and key2 in JSON_OBJECT[subcat2]:
+            data1 = JSON_OBJECT[subcat1][key1]
+            JSON_OBJECT[subcat1][key1] = JSON_OBJECT[subcat2][key2]
+            JSON_OBJECT[subcat2][key2] = data1
+            writeObjToFile(JSON_OBJECT)
+        else:
+            raise InvalidKeyException
+    else:
+        raise InvalidArgumentException
 
 def copy(args):
     JSON_OBJECT = readFromFile()
@@ -96,13 +143,12 @@ def copy(args):
         key = JSON_OBJECT["lastkey"][-1]
     else:
         raise InvalidKeyException
-    isint = str.isdigit(key)
-    
-    if key in JSON_OBJECT["numerals" if isint else "custom"]:
-        pyperclipcopy(JSON_OBJECT["numerals" if isint else "custom"][key])
+    subcat1 = subcat(key)
+    if key in JSON_OBJECT[subcat1]:
+        pyperclipcopy(JSON_OBJECT[subcat1][key])
         delete = True if len(args) == 4 and args[3].lower().strip() == '-d' else False
         if delete:
-            del JSON_OBJECT["numerals" if isint else "custom"][key]
+            del JSON_OBJECT[subcat1][key]
             if key in JSON_OBJECT["lastkey"]:
                 JSON_OBJECT["lastkey"] = JSON_OBJECT["lastkey"][1:] if len(JSON_OBJECT["lastkey"]) > 0 else []
             writeObjToFile(JSON_OBJECT)
