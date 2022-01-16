@@ -143,7 +143,7 @@ class TestFile(unittest.TestCase):
         os.system(pythonstr + " -f \"testfile.txt\" 1 0:5")
         json = readFromFile()
         self.assertTrue("1" in json["numerals"])
-        self.assertEquals(string, json["numerals"]["1"])
+        self.assertEqual(string, json["numerals"]["1"])
         
 class TestCk(unittest.TestCase):
     
@@ -163,7 +163,7 @@ class TestCk(unittest.TestCase):
         
         self.assertTrue("1" in json["numerals"])
         self.assertFalse("0" in json["numerals"])
-        self.assertEquals("test1\n", json["numerals"]["1"])
+        self.assertEqual("test1\n", json["numerals"]["1"])
 
 
 if __name__ == '__main__':

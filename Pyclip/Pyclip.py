@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 from sys import argv, stdin
+from pyperclip import copy as pyperclipcopy
 
 try:
     import ujson as json
 except ImportError:
     import json
     
-from pyperclip import copy as pyperclipcopy
 
 FILENAME = ".pyclipstore.json"
 MAXKEYMEMSIZE = 20

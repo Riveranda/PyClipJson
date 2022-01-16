@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+Pyclip/Pyclip.py
+Pyclip/__init__.py
+Pyclip.egg-info/PKG-INFO
+Pyclip.egg-info/SOURCES.txt
+Pyclip.egg-info/dependency_links.txt
+Pyclip.egg-info/top_level.txt
+Pyclip/tests/__init__.py
+Pyclip/tests/test_main.py
