@@ -24,3 +24,5 @@ jobs:
         run: pwd
       - name: ls
         run : ls
+      - name: Run tests with pytest
+        run: python ./Pytest/tests/test_main.py
