@@ -28,3 +28,5 @@ jobs:
         run : ls ./Pyclip
       - name: ls3
         run : ls ./Pyclip/tests
+      - name: run tests
+        run : python ./Pyclip/tests/test_main.py
