@@ -24,7 +24,6 @@ import unittest
 import sys
 import os
 from os.path import exists
-
 if __name__ != "__main__":
     from Pyclip import *
 else:
