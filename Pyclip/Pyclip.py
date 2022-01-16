@@ -29,7 +29,7 @@ except ImportError:
     
 from pyperclip import copy as pyperclipcopy
 
-FILENAME = ".pydisstore.json"
+FILENAME = ".pyclipstore.json"
 MAXKEYMEMSIZE = 20
 
 class InvalidKeyException(Exception):
@@ -114,7 +114,6 @@ def file(args):
                 key = args[3].strip()
                 if(':' in args[4]):
                     contents = readrange(args[4])
-                
             writeToFile(contents, key)
     else:
         raise InvalidArgumentException
@@ -173,9 +172,28 @@ def delete(args):
         else:
             del JSON_OBJECT["custom"][key]
         writeObjToFile(JSON_OBJECT)
+    else:
+        raise InvalidArgumentException
+
+def help(args):
+    pass
 
 def copykey(args):
-    pass
+    # pyclip -ck 3 4    
+    if len(args) == 4:
+        key1, key2 = args[2].strip(), args[3].strip()
+        subcat1, subcat2 = subcat(key1), subcat(key2)
+        print(key1, key2)
+        print(subcat1, subcat2)
+        JSON_OBJECT = readFromFile()
+        if key1 in JSON_OBJECT[subcat1] and key2 in JSON_OBJECT[subcat2]:
+            JSON_OBJECT[subcat2][key2] = JSON_OBJECT[subcat1][key1]
+            del JSON_OBJECT[subcat1][key1]
+            writeObjToFile(JSON_OBJECT)
+        else:
+            raise InvalidKeyException
+    else:
+        raise InvalidArgumentException
 
 def pipe(args):
     data = stdin.read()
@@ -195,13 +213,15 @@ FUNCTIONS = {
     "-p": printdb,
     "-clear": clear,
     "-d": delete,
-    "-ck": copykey
+    "-ck": copykey,
+    "help": help,
+    "-h": help
 }
 
 def main():
     if len(argv) < 2 or (len(argv) == 2 and '-' not in argv[1]):
-        # command | pydis 
-        # command | pydis mykey
+        # command | pyclip
+        # command | pyclip mykey
         pipe(argv)
     else:
         # Fetch function from dictionary and execute

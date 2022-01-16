@@ -26,19 +26,19 @@ import os
 from os.path import exists
 
 if __name__ != "__main__":
-    from Pydis import *
+    from Pyclip import *
 else:
-    sys.path.append('../Pydis')
-    from Pydis.Pydis import *
+    sys.path.append('../Pyclip')
+    from Pyclip.Pyclip import *
     
 def deldatabasefile():
     try:
-        os.remove(".pydisstore.json")
+        os.remove(".pyclipstore.json")
     except FileNotFoundError as _:
         pass
     
 
-pythonstr = "python3 Pydis/Pydis.py"
+pythonstr = "python3 Pyclip/Pyclip.py"
 
 def systemexcecute(str):
     os.system(str)
@@ -144,6 +144,26 @@ class TestFile(unittest.TestCase):
         json = readFromFile()
         self.assertTrue("1" in json["numerals"])
         self.assertEquals(string, json["numerals"]["1"])
+        
+class TestCk(unittest.TestCase):
+    
+    def testck(self):
+        deldatabasefile()
+        os.system("echo \"test1\" | " + pythonstr)
+        os.system("echo \"test2\" | " + pythonstr)
+        
+        json = readFromFile()
+        
+        self.assertTrue("0" in json["numerals"])
+        self.assertTrue("1" in json["numerals"])
+        
+        os.system(pythonstr + " -ck 0 1")
+        
+        json = readFromFile()
+        
+        self.assertTrue("1" in json["numerals"])
+        self.assertFalse("0" in json["numerals"])
+        self.assertEquals("test1\n", json["numerals"]["1"])
 
 
 if __name__ == '__main__':
